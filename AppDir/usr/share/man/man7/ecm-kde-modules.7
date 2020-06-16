@@ -1,0 +1,517 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "ECM-KDE-MODULES" "7" "December 01, 2016" "5.27" "Extra CMake Modules"
+.SH NAME
+ecm-kde-modules \- ECM KDE Modules Reference
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH INTRODUCTION
+.sp
+Extra CMake Modules (ECM) provides several modules that provide default settings
+(like installation directories, compiler flags and other CMake options) aimed at
+software produced by the KDE modules; these are documented here. ECM also
+provides modules with more general functionality, documented in
+\fBecm\-modules(7)\fP, and ones that extend the functionality of the
+\fBfind_package\fP command, documented in \fBecm\-find\-modules(7)\fP\&.
+.sp
+To use these modules, you need to tell CMake to find the ECM package, and
+then add either \fB${ECM_MODULE_PATH}\fP or \fB${ECM_KDE_MODULE_DIR}\fP to the
+\fBCMAKE_MODULE_PATH\fP variable:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+find_package(ECM REQUIRED NO_MODULE)
+set(CMAKE_MODULE_PATH ${ECM_MODULE_DIR})
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Using \fB${ECM_MODULE_PATH}\fP will also make the other types of modules
+available.
+.SH ALL KDE MODULES
+.SS KDECMakeSettings
+.sp
+Changes various CMake settings to what the KDE community views as more
+sensible defaults.
+.sp
+It is recommended to include this module with the NO_POLICY_SCOPE flag,
+otherwise you may get spurious warnings with some versions of CMake.
+.sp
+It is split into three parts, which can be independently disabled if desired.
+.SS Runtime Paths
+.sp
+The default runtime path (used on Unix systems to search for
+dynamically\-linked libraries) is set to include the location that libraries
+will be installed to (as set in LIB_INSTALL_DIR), and also the linker search
+path.
+.sp
+Note that \fBLIB_INSTALL_DIR\fP needs to be set before including this module.
+Typically, this is done by including the \fBKDEInstallDirs\fP module.
+.sp
+This section can be disabled by setting \fBKDE_SKIP_RPATH_SETTINGS\fP to TRUE
+before including this module.
+.SS Testing
+.sp
+Testing is enabled by default, and an option (BUILD_TESTING) is provided for
+users to control this. See the CTest module documentation in the CMake manual
+for more details.
+.sp
+This section can be disabled by setting \fBKDE_SKIP_TEST_SETTINGS\fP to TRUE
+before including this module.
+.SS Build Settings
+.sp
+Various CMake build defaults are altered, such as searching source and build
+directories for includes first and enabling automoc by default.
+.sp
+This section can be disabled by setting \fBKDE_SKIP_BUILD_SETTINGS\fP to TRUE
+before including this module.
+.sp
+This section also provides an "uninstall" target that can be individually
+disabled by setting \fBKDE_SKIP_UNINSTALL_TARGET\fP to TRUE before including
+this module.
+.sp
+By default on OS X, X11 and XCB related detections are disabled. However if
+the need would arise to use these technologies, the detection can be enabled
+by setting \fBAPPLE_FORCE_X11\fP to \fBON\fP\&.
+.sp
+A warning is printed for the developer to know that the detection is disabled on OS X.
+This message can be turned off by setting \fBAPPLE_SUPPRESS_X11_WARNING\fP to \fBON\fP\&.
+.sp
+Since pre\-1.0.0.
+.sp
+\fBENABLE_CLAZY\fP option is added (OFF by default) when clang is being used.
+Turning this option on will force clang to load the clazy plugins for richer
+warnings on Qt\-related code.
+.sp
+If clang is not being used, this won\(aqt have an effect.
+See \fI\%https://quickgit.kde.org/?p=clazy.git&a=blob&f=README&o=plain\fP
+.sp
+Since 5.17.0
+.INDENT 0.0
+.IP \(bu 2
+Uninstall target functionality since 1.7.0.
+.IP \(bu 2
+\fBAPPLE_FORCE_X11\fP option since 5.14.0 (detecting X11 was previously the default behavior)
+.IP \(bu 2
+\fBAPPLE_SUPPRESS_X11_WARNING\fP option since 5.14.0
+.UNINDENT
+.SS KDECompilerSettings
+.sp
+Set useful compile and link flags for C++ (and C) code.
+.sp
+Enables many more warnings than the default, and sets stricter modes
+for some compiler features.  By default, exceptions are disabled;
+kde_target_enable_exceptions() can be used to re\-enable them for a
+specific target.
+.sp
+NB: it is recommended to include this module with the NO_POLICY_SCOPE
+flag, otherwise you may get spurious warnings with some versions of CMake.
+.sp
+This module provides the following functions:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+kde_source_files_enable_exceptions([file1 [file2 [...]]])
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Enables exceptions for specific source files.  This should not be
+used on source files in a language other than C++.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+kde_target_enable_exceptions(target <INTERFACE|PUBLIC|PRIVATE>)
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Enables exceptions for a specific target.  This should not be used
+on a target that has source files in a language other than C++.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+kde_enable_exceptions()
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Enables exceptions for C++ source files compiled for the
+CMakeLists.txt file in the current directory and all subdirectories.
+.sp
+Since pre\-1.0.0.
+.SS KDEFrameworkCompilerSettings
+.sp
+Set stricter compile and link flags for KDE Frameworks modules.
+.sp
+The KDECompilerSettings module is included and, in addition, various
+defines that affect the Qt libraries are set to enforce certain
+conventions.
+.sp
+For example, constructions like QString("foo") are prohibited, instead
+forcing the use of QLatin1String or QStringLiteral, and some
+Qt\-defined keywords like signals and slots will not be defined.
+.sp
+NB: it is recommended to include this module with the NO_POLICY_SCOPE
+flag, otherwise you may get spurious warnings with some versions of CMake.
+.sp
+Since pre\-1.0.0.
+.SS KDEInstallDirs
+.sp
+Define KDE standard installation directories.
+.sp
+Note that none of the variables defined by this module provide any
+information about the location of already\-installed KDE software.
+.sp
+Inclusion of this module defines the following variables:
+.INDENT 0.0
+.TP
+.B \fBKDE_INSTALL_<dir>\fP
+destination for files of a given type
+.TP
+.B \fBKDE_INSTALL_FULL_<dir>\fP
+corresponding absolute path
+.UNINDENT
+.sp
+where \fB<dir>\fP is one of (default values in parentheses and alternative,
+deprecated variable name in square brackets):
+.INDENT 0.0
+.TP
+.B \fBBUNDLEDIR\fP
+application bundles (\fB/Applications/KDE\fP) [\fBBUNDLE_INSTALL_DIR\fP]
+.TP
+.B \fBEXECROOTDIR\fP
+executables and libraries (\fB<empty>\fP) [\fBEXEC_INSTALL_PREFIX\fP]
+.TP
+.B \fBBINDIR\fP
+user executables (\fBEXECROOTDIR/bin\fP) [\fBBIN_INSTALL_DIR\fP]
+.TP
+.B \fBSBINDIR\fP
+system admin executables (\fBEXECROOTDIR/sbin\fP) [\fBSBIN_INSTALL_DIR\fP]
+.TP
+.B \fBLIBDIR\fP
+object code libraries (\fBEXECROOTDIR/lib\fP, \fBEXECROOTDIR/lib64\fP or
+\fBEXECROOTDIR/lib/<multiarch\-tuple\fP on Debian) [\fBLIB_INSTALL_DIR\fP]
+.TP
+.B \fBLIBEXECDIR\fP
+executables for internal use by programs and libraries (\fBBINDIR\fP on
+Windows, \fBLIBDIR/libexec\fP otherwise) [\fBLIBEXEC_INSTALL_DIR\fP]
+.TP
+.B \fBCMAKEPACKAGEDIR\fP
+CMake packages, including config files (\fBLIBDIR/cmake\fP)
+[\fBCMAKECONFIG_INSTALL_PREFIX\fP]
+.TP
+.B \fBQTPLUGINDIR\fP
+Qt plugins (\fBLIBDIR/plugins\fP) [\fBQT_PLUGIN_INSTALL_DIR\fP]
+.TP
+.B \fBPLUGINDIR\fP
+Plugins (\fBQTPLUGINDIR\fP) [\fBPLUGIN_INSTALL_DIR\fP]
+.TP
+.B \fBQTQUICKIMPORTSDIR\fP
+QtQuick1 imports (\fBQTPLUGINDIR/imports\fP) [\fBIMPORTS_INSTALL_DIR\fP]
+.TP
+.B \fBQMLDIR\fP
+QtQuick2 imports (\fBLIBDIR/qml\fP) [\fBQML_INSTALL_DIR\fP]
+.TP
+.B \fBINCLUDEDIR\fP
+C and C++ header files (\fBinclude\fP) [\fBINCLUDE_INSTALL_DIR\fP]
+.TP
+.B \fBLOCALSTATEDIR\fP
+modifiable single\-machine data (\fBvar\fP)
+.TP
+.B \fBSHAREDSTATEDIR\fP
+modifiable architecture\-independent data (\fBcom\fP)
+.TP
+.B \fBDATAROOTDIR\fP
+read\-only architecture\-independent data root (\fBshare\fP)
+[\fBSHARE_INSTALL_PREFIX\fP]
+.TP
+.B \fBDATADIR\fP
+read\-only architecture\-independent data (\fBDATAROOTDIR\fP)
+[\fBDATA_INSTALL_DIR\fP]
+.TP
+.B \fBDOCBUNDLEDIR\fP
+documentation bundles generated using kdoctools
+(\fBDATAROOTDIR/doc/HTML\fP) [\fBHTML_INSTALL_DIR\fP]
+.TP
+.B \fBKCFGDIR\fP
+kconfig description files (\fBDATAROOTDIR/config.kcfg\fP)
+[\fBKCFG_INSTALL_DIR\fP]
+.TP
+.B \fBKCONFUPDATEDIR\fP
+kconf_update scripts (\fBDATAROOTDIR/kconf_update\fP)
+[\fBKCONF_UPDATE_INSTALL_DIR\fP]
+.TP
+.B \fBKSERVICES5DIR\fP
+services for KDE Frameworks 5 (\fBDATAROOTDIR/kservices5\fP)
+[\fBSERVICES_INSTALL_DIR\fP]
+.TP
+.B \fBKSERVICETYPES5DIR\fP
+service types for KDE Frameworks 5 (\fBDATAROOTDIR/kservicetypes5\fP)
+[\fBSERVICETYPES_INSTALL_DIR\fP]
+.TP
+.B \fBKXMLGUI5DIR\fP
+knotify description files (\fBDATAROOTDIR/kxmlgui5\fP)
+[\fBKXMLGUI_INSTALL_DIR\fP]
+.TP
+.B \fBKTEMPLATESDIR\fP
+Kapptemplate and Kdevelop templates (\fBkdevappwizard/templates\fP)
+.TP
+.B \fBKNOTIFY5RCDIR\fP
+knotify description files (\fBDATAROOTDIR/knotifications5\fP)
+[\fBKNOTIFYRC_INSTALL_DIR\fP]
+.TP
+.B \fBICONDIR\fP
+icons (\fBDATAROOTDIR/icons\fP) [\fBICON_INSTALL_DIR\fP]
+.TP
+.B \fBLOCALEDIR\fP
+knotify description files (\fBDATAROOTDIR/locale\fP)
+[\fBLOCALE_INSTALL_DIR\fP]
+.TP
+.B \fBSOUNDDIR\fP
+sound files (\fBDATAROOTDIR/sounds\fP) [\fBSOUND_INSTALL_DIR\fP]
+.TP
+.B \fBTEMPLATEDIR\fP
+templates (\fBDATAROOTDIR/templates\fP) [\fBTEMPLATES_INSTALL_DIR\fP]
+.TP
+.B \fBWALLPAPERDIR\fP
+desktop wallpaper images (\fBDATAROOTDIR/wallpapers\fP)
+[\fBWALLPAPER_INSTALL_DIR\fP]
+.TP
+.B \fBAPPDIR\fP
+application desktop files (\fBDATAROOTDIR/applications\fP)
+[\fBXDG_APPS_INSTALL_DIR\fP]
+.TP
+.B \fBDESKTOPDIR\fP
+desktop directories (\fBDATAROOTDIR/desktop\-directories\fP)
+[\fBXDG_DIRECTORY_INSTALL_DIR\fP]
+.TP
+.B \fBMIMEDIR\fP
+mime description files (\fBDATAROOTDIR/mime/packages\fP)
+[\fBXDG_MIME_INSTALL_DIR\fP]
+.TP
+.B \fBMETAINFODIR\fP
+AppStream component metadata files (\fBDATAROOTDIR/metainfo\fP)
+.TP
+.B \fBMANDIR\fP
+man documentation (\fBDATAROOTDIR/man\fP) [\fBMAN_INSTALL_DIR\fP]
+.TP
+.B \fBINFODIR\fP
+info documentation (\fBDATAROOTDIR/info\fP)
+.TP
+.B \fBDBUSDIR\fP
+D\-Bus (\fBDATAROOTDIR/dbus\-1\fP)
+.TP
+.B \fBDBUSINTERFACEDIR\fP
+D\-Bus interfaces (\fBDBUSDIR/interfaces\fP)
+[\fBDBUS_INTERFACES_INSTALL_DIR\fP]
+.TP
+.B \fBDBUSSERVICEDIR\fP
+D\-Bus session services (\fBDBUSDIR/services\fP)
+[\fBDBUS_SERVICES_INSTALL_DIR\fP]
+.TP
+.B \fBDBUSSYSTEMSERVICEDIR\fP
+D\-Bus system services (\fBDBUSDIR/system\-services\fP)
+[\fBDBUS_SYSTEM_SERVICES_INSTALL_DIR\fP]
+.TP
+.B \fBSYSCONFDIR\fP
+read\-only single\-machine data
+(\fBetc\fP, or \fB/etc\fP if \fBCMAKE_INSTALL_PREFIX\fP is \fB/usr\fP)
+[\fBSYSCONF_INSTALL_DIR\fP]
+.TP
+.B \fBCONFDIR\fP
+application configuration files (\fBSYSCONFDIR/xdg\fP)
+[\fBCONFIG_INSTALL_DIR\fP]
+.TP
+.B \fBAUTOSTARTDIR\fP
+autostart files (\fBCONFDIR/autostart\fP) [\fBAUTOSTART_INSTALL_DIR\fP]
+.UNINDENT
+.sp
+If \fBKDE_INSTALL_DIRS_NO_DEPRECATED\fP is set to TRUE before including this
+module, the deprecated variables (listed in the square brackets above) are
+not defined.
+.sp
+In addition, for each \fBKDE_INSTALL_*\fP variable, an equivalent
+\fBCMAKE_INSTALL_*\fP variable is defined. If
+\fBKDE_INSTALL_DIRS_NO_DEPRECATED\fP is set to TRUE, only those variables
+defined by the \fBGNUInstallDirs\fP module (shipped with CMake) are defined.
+If \fBKDE_INSTALL_DIRS_NO_CMAKE_VARIABLES\fP is set to TRUE, no variables with
+a \fBCMAKE_\fP prefix will be defined by this module (other than
+CMAKE_INSTALL_DEFAULT_COMPONENT_NAME \- see below).
+.sp
+The \fBKDE_INSTALL_<dir>\fP variables (or their \fBCMAKE_INSTALL_<dir>\fP or
+deprecated counterparts) may be passed to the DESTINATION options of
+\fBinstall()\fP commands for the corresponding file type.  They are set in the
+CMake cache, and so the defaults above can be overridden by users.
+.sp
+Note that the \fBKDE_INSTALL_<dir>\fP, \fBCMAKE_INSTALL_<dir>\fP or deprecated
+form of the variable can be changed using CMake command line variable
+definitions; in either case, all forms of the variable will be affected. The
+effect of passing multiple forms of the same variable on the command line
+(such as \fBKDE_INSTALL_BINDIR\fP and \fBCMAKE_INSTALL_BINDIR\fP is undefined.
+.sp
+The variable \fBKDE_INSTALL_TARGETS_DEFAULT_ARGS\fP is also defined (along with
+the deprecated form \fBINSTALL_TARGETS_DEFAULT_ARGS\fP).  This should be used
+when libraries or user\-executable applications are installed, in the
+following manner:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+install(TARGETS mylib myapp ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+It MUST NOT be used for installing plugins, system admin executables or
+executables only intended for use internally by other code.  Those should use
+\fBKDE_INSTALL_PLUGINDIR\fP, \fBKDE_INSTALL_SBINDIR\fP or
+\fBKDE_INSTALL_LIBEXECDIR\fP respectively.
+.sp
+Additionally, \fBCMAKE_INSTALL_DEFAULT_COMPONENT_NAME\fP will be set to
+\fB${PROJECT_NAME}\fP to provide a sensible default for this CMake option.
+.sp
+Note that mixing absolute and relative paths, particularly for \fBBINDIR\fP,
+\fBLIBDIR\fP and \fBINCLUDEDIR\fP, can cause issues with exported targets. Given
+that the default values for these are relative paths, relative paths should
+be used on the command line when possible (eg: use
+\fB\-DKDE_INSTALL_LIBDIR=lib64\fP instead of
+\fB\-DKDE_INSTALL_LIBDIR=././/lib/lib64\fP to override the library directory).
+.sp
+Since pre\-1.0.0.
+.sp
+NB: The variables starting \fBKDE_INSTALL_\fP are only available since 1.6.0.
+The \fBAPPDIR\fP install variable is available since 1.1.0.
+.SS KDETemplateGenerator
+.sp
+Packages KApptemplate/KDevelop compatible application templates
+.sp
+This module provides a functionality to package in a tarball and
+install project templates compatible with the format used by
+KApptemplate and KDevelop. Useful for providing minimal examples
+for the usage of the KDE Frameworks.
+.sp
+This module provides the following function:
+.sp
+kde_package_app_templates( TEMPLATES template1 [template2] [...] INSTALL_DIR directory)
+.sp
+INSTALL_DIR is the directory to install the template package to.
+In most cases you will want to use the variable KDE_INSTALL_KTEMPLATESDIR
+from \fBKDEInstallDirs\fP\&.
+.sp
+TEMPLATES lists subdirectories containing template files;
+each \fB<template>\fP directory will be packaged into a file named
+\fB<template>.tar.bz2\fP and installed to the appropriate location.
+.sp
+The template is a minimal source tree of an application as if it was
+an application project by itself, with names (file names or text inside)
+the text files replaced by the following placeholders when needed:
+.INDENT 0.0
+.TP
+.B \fB%{PROJECTDIRNAME}\fP
+%{APPNAMELC}\-%{VERSION} for KAppTemplate
+.TP
+.B \fB%{APPNAME}\fP
+project name as entered by user ex: MyKApp
+.TP
+.B \fB%{APPNAMELC}\fP
+project name in lower case ex: mykapp
+.TP
+.B \fB%{APPNAMEUC}\fP
+project name in upper case ex: MYKAPP
+.TP
+.B \fB%{CPP_TEMPLATE}\fP
+license header for cpp file
+.TP
+.B \fB%{H_TEMPLATE}\fP
+license header for h file
+.TP
+.B \fB%{AUTHOR}\fP
+author name ex: George Ignacious
+.TP
+.B \fB%{EMAIL}\fP
+author email ex: \fI\%foo@bar.org\fP
+.TP
+.B \fB%{VERSION}\fP
+project version ex: 0.1
+.TP
+.B \fB%{dest}\fP
+used in .kdevtemplate
+.TP
+.B \fB%{src}\fP
+used in .kdevtemplate
+.UNINDENT
+.sp
+Multiple templates can be passed at once.
+.sp
+Since 5.18
+.SH COPYRIGHT
+KDE Developers
+.\" Generated by docutils manpage writer.
+.

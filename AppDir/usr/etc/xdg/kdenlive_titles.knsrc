@@ -1,0 +1,9 @@
+[KNewStuff2]
+ProvidersUrl=https://kdenlive.org/data/titletemplates.xml
+TargetDir=kdenlive/titles
+Uncompress=archive
+
+[KNewStuff3]
+ProvidersUrl=https://kdenlive.org/data/titletemplates.xml
+TargetDir=kdenlive/titles
+Uncompress=archive

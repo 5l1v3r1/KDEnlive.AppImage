@@ -1,0 +1,707 @@
+.\" Man page generated from reStructuredText.
+.
+.TH "ECM-FIND-MODULES" "7" "December 01, 2016" "5.27" "Extra CMake Modules"
+.SH NAME
+ecm-find-modules \- ECM Find Modules Reference
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.
+.nr rst2man-indent-level 0
+.
+.de1 rstReportMargin
+\\$1 \\n[an-margin]
+level \\n[rst2man-indent-level]
+level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
+-
+\\n[rst2man-indent0]
+\\n[rst2man-indent1]
+\\n[rst2man-indent2]
+..
+.de1 INDENT
+.\" .rstReportMargin pre:
+. RS \\$1
+. nr rst2man-indent\\n[rst2man-indent-level] \\n[an-margin]
+. nr rst2man-indent-level +1
+.\" .rstReportMargin post:
+..
+.de UNINDENT
+. RE
+.\" indent \\n[an-margin]
+.\" old: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.nr rst2man-indent-level -1
+.\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
+.in \\n[rst2man-indent\\n[rst2man-indent-level]]u
+..
+.SH INTRODUCTION
+.sp
+Find modules are used by the CMake \fBfind_package\fP command to search for
+packages that do not provide their own CMake package config files. CMake
+provides an extensive set of find modules, and Extra CMake Modules (ECM) adds
+to that.
+.sp
+To use ECM\(aqs find modules, you need to tell CMake to find the ECM package, and
+then add either \fB${ECM_MODULE_PATH}\fP or \fB${ECM_FIND_MODULE_DIR}\fP to the
+\fBCMAKE_MODULE_PATH\fP variable:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+find_package(ECM REQUIRED NO_MODULE)
+set(CMAKE_MODULE_PATH ${ECM_FIND_MODULE_DIR})
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Using \fB${ECM_MODULE_PATH}\fP will also make the modules intended for direct use
+by CMake scripts available (see \fBecm\-modules(7)\fP and
+\fBecm\-kde\-modules(7)\fP).
+.sp
+You can also make local copies of find modules using the
+\fBecm_use_find_modules\fP function from \fBECMUseFindModules\fP, which is
+automatically included when ECM is found:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+find_package(ECM REQUIRED NO_MODULE)
+ecm_use_find_modules(
+    DIR "${CMAKE_BINARY_DIR}/cmake"
+    MODULES FindEGL.cmake
+)
+set(CMAKE_MODULE_PATH "${CMAKE_BINARY_DIR}/cmake")
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+This allows selective use of ECM\(aqs find modules, and the NO_OVERRIDE argument
+can be used to ensure that if CMake ships its own version of that find module,
+it will be used instead.
+.SH ALL FIND MODULES
+.SS FindEGL
+.sp
+Try to find EGL.
+.sp
+This will define the following variables:
+.INDENT 0.0
+.TP
+.B \fBEGL_FOUND\fP
+True if (the requested version of) EGL is available
+.TP
+.B \fBEGL_VERSION\fP
+The version of EGL; note that this is the API version defined in the
+headers, rather than the version of the implementation (eg: Mesa)
+.TP
+.B \fBEGL_LIBRARIES\fP
+This can be passed to target_link_libraries() instead of the \fBEGL::EGL\fP
+target
+.TP
+.B \fBEGL_INCLUDE_DIRS\fP
+This should be passed to target_include_directories() if the target is not
+used for linking
+.TP
+.B \fBEGL_DEFINITIONS\fP
+This should be passed to target_compile_options() if the target is not
+used for linking
+.UNINDENT
+.sp
+If \fBEGL_FOUND\fP is TRUE, it will also define the following imported target:
+.INDENT 0.0
+.TP
+.B \fBEGL::EGL\fP
+The EGL library
+.UNINDENT
+.sp
+In general we recommend using the imported target, as it is easier to use.
+Bear in mind, however, that if the target is in the link interface of an
+exported library, it must be made available by the package config file.
+.sp
+Since pre\-1.0.0.
+.SS FindKF5
+.sp
+Find KDE Frameworks 5 with a single find_package() call.
+.sp
+This will use the package config files provided by the individual frameworks.
+For example, if you wish to find KArchive, which presents itself to CMake as
+KF5Archive (ie: you would do \fBfind_package(KF5Archive)\fP to find it
+directly), you can do
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+find_package(KF5 COMPONENTS Archive)
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+If all the required components (those given in the COMPONENTS argument, but
+not those given in the OPTIONAL_COMPONENTS argument) are found, \fBKF5_FOUND\fP
+will be set to true. Otherwise, it will be set to false.
+.sp
+Since pre\-1.0.0.
+.SS FindLibGit2
+.sp
+Try to find libgit2 on a Unix system.
+.sp
+This will define the following variables:
+.INDENT 0.0
+.TP
+.B \fBLIBGIT2_FOUND\fP
+True if (the requested version of) libgit2 is available
+.TP
+.B \fBLIBGIT2_VERSION\fP
+The version of libgit2
+.TP
+.B \fBLIBGIT2_LIBRARIES\fP
+This can be passed to target_link_libraries() instead of the \fBLibGit2::LibGit2\fP
+target
+.TP
+.B \fBLIBGIT2_INCLUDE_DIRS\fP
+This should be passed to target_include_directories() if the target is not
+used for linking
+.TP
+.B \fBLIBGIT2_DEFINITIONS\fP
+This should be passed to target_compile_options() if the target is not
+used for linking
+.UNINDENT
+.sp
+If \fBLIBGIT2_FOUND\fP is TRUE, it will also define the following imported target:
+.INDENT 0.0
+.TP
+.B \fBLibGit2::LibGit2\fP
+The libgit2 library
+.UNINDENT
+.sp
+In general we recommend using the imported target, as it is easier to use.
+Bear in mind, however, that if the target is in the link interface of an
+exported library, it must be made available by the package config file.
+.sp
+Since 1.3.0.
+.SS FindOpenEXR
+.sp
+Try to find the OpenEXR libraries.
+.sp
+This will define the following variables:
+.INDENT 0.0
+.TP
+.B \fBOpenEXR_FOUND\fP
+True if OpenEXR is available
+.TP
+.B \fBOpenEXR_LIBRARIES\fP
+Link to these to use OpenEXR
+.TP
+.B \fBOpenEXR_INCLUDE_DIRS\fP
+Include directory for OpenEXR
+.TP
+.B \fBOpenEXR_DEFINITIONS\fP
+Compiler flags required to link against OpenEXR
+.UNINDENT
+.sp
+and the following imported targets:
+.INDENT 0.0
+.TP
+.B \fBOpenEXR::IlmImf\fP
+The OpenEXR core library
+.UNINDENT
+.sp
+In general we recommend using the imported target, as it is easier to use.
+Bear in mind, however, that if the target is in the link interface of an
+exported library, it must be made available by the package config file.
+.sp
+Since pre\-1.0.0.
+.SS FindPng2Ico
+.sp
+Try to find png2ico.
+.sp
+If the png2ico executable is not in your PATH, you can provide
+an alternative name or full path location with the \fBPng2Ico_EXECUTABLE\fP
+variable.
+.sp
+This will define the following variables:
+.INDENT 0.0
+.TP
+.B \fBPng2Ico_FOUND\fP
+True if png2ico is available.
+.TP
+.B \fBPng2Ico_EXECUTABLE\fP
+The png2ico executable.
+.UNINDENT
+.sp
+If \fBPng2Ico_FOUND\fP is TRUE, it will also define the following imported
+target:
+.INDENT 0.0
+.TP
+.B \fBPng2Ico::Png2Ico\fP
+The png2ico executable.
+.UNINDENT
+.sp
+and the following variables:
+.INDENT 0.0
+.TP
+.B \fBPng2Ico_HAS_COLORS_ARGUMENT\fP
+Whether png2ico accepts a \fB\-\-colors\fP argument. \fI\%Matthias Benkmann's
+tool\fP does, while the
+version of png2ico from the \fI\%"KDE On Windows" (kdewin)\fP project does not.
+.TP
+.B \fBPng2Ico_HAS_RCFILE_ARGUMENT\fP
+Whether png2ico accepts an \fB\-\-rcfile\fP argument. The version of png2ico
+from the \fI\%"KDE On Windows" (kdewin)\fP project does,
+while \fI\%Matthias Benkmann's tool\fP does not.
+.UNINDENT
+.sp
+Since 1.7.0.
+.SS FindPoppler
+.sp
+Try to find Poppler.
+.sp
+This is a component\-based find module, which makes use of the COMPONENTS
+and OPTIONAL_COMPONENTS arguments to find_module.  The following components
+are available:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Core  Cpp  Qt5  Qt4 Glib
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+If no components are specified, this module will act as though all components
+were passed to OPTIONAL_COMPONENTS.
+.sp
+This module will define the following variables, independently of the
+components searched for or found:
+.INDENT 0.0
+.TP
+.B \fBPoppler_FOUND\fP
+TRUE if (the requested version of) Poppler is available
+.TP
+.B \fBPoppler_VERSION\fP
+Found Poppler version
+.TP
+.B \fBPoppler_TARGETS\fP
+A list of all targets imported by this module (note that there may be more
+than the components that were requested)
+.TP
+.B \fBPoppler_LIBRARIES\fP
+This can be passed to target_link_libraries() instead of the imported
+targets
+.TP
+.B \fBPoppler_INCLUDE_DIRS\fP
+This should be passed to target_include_directories() if the targets are
+not used for linking
+.TP
+.B \fBPoppler_DEFINITIONS\fP
+This should be passed to target_compile_options() if the targets are not
+used for linking
+.UNINDENT
+.sp
+For each searched\-for components, \fBPoppler_<component>_FOUND\fP will be set to
+TRUE if the corresponding Poppler library was found, and FALSE otherwise.  If
+\fBPoppler_<component>_FOUND\fP is TRUE, the imported target
+\fBPoppler::<component>\fP will be defined.  This module will also attempt to
+determine \fBPoppler_*_VERSION\fP variables for each imported target, although
+\fBPoppler_VERSION\fP should normally be sufficient.
+.sp
+In general we recommend using the imported targets, as they are easier to use
+and provide more control.  Bear in mind, however, that if any target is in the
+link interface of an exported library, it must be made available by the
+package config file.
+.sp
+Since 5.19
+.SS FindQtWaylandScanner
+.sp
+Try to find qtwaylandscanner.
+.sp
+If the qtwaylandscanner executable is not in your PATH, you can provide
+an alternative name or full path location with the \fBQtWaylandScanner_EXECUTABLE\fP
+variable.
+.sp
+This will define the following variables:
+.INDENT 0.0
+.TP
+.B \fBQtWaylandScanner_FOUND\fP
+True if qtwaylandscanner is available
+.TP
+.B \fBQtWaylandScanner_EXECUTABLE\fP
+The qtwaylandscanner executable.
+.UNINDENT
+.sp
+If \fBQtWaylandScanner_FOUND\fP is TRUE, it will also define the following imported
+target:
+.INDENT 0.0
+.TP
+.B \fBWayland::QtScanner\fP
+The qtwaylandscanner executable.
+.UNINDENT
+.sp
+This module provides the following functions to generate C++ protocol
+implementations:
+.INDENT 0.0
+.INDENT 3.5
+.INDENT 0.0
+.IP \(bu 2
+\fBecm_add_qtwayland_client_protocol\fP
+.IP \(bu 2
+\fBecm_add_qtwayland_server_protocol\fP
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ecm_add_qtwayland_client_protocol(<source_files_var>
+                                  PROTOCOL <xmlfile>
+                                  BASENAME <basename>
+                                  [PREFIX <prefix>])
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Generate C++ wrapper to Wayland client protocol files from \fB<xmlfile>\fP
+XML definition for the \fB<basename>\fP interface and append those files
+to \fB<source_files_var>\fP\&.  Pass the \fB<prefix>\fP argument if the interface
+names don\(aqt start with \fBqt_\fP or \fBwl_\fP\&.
+.sp
+WaylandScanner is required and will be searched for.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ecm_add_qtwayland_server_protocol(<source_files_var>
+                                  PROTOCOL <xmlfile>
+                                  BASENAME <basename>
+                                  [PREFIX <prefix>])
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Generate C++ wrapper to Wayland server protocol files from \fB<xmlfile>\fP
+XML definition for the \fB<basename>\fP interface and append those files
+to \fB<source_files_var>\fP\&.  Pass the \fB<prefix>\fP argument if the interface
+names don\(aqt start with \fBqt_\fP or \fBwl_\fP\&.
+.sp
+WaylandScanner is required and will be searched for.
+.sp
+Since 1.4.0.
+.SS FindSharedMimeInfo
+.sp
+Try to find the shared\-mime\-info package.
+.sp
+This will define the following variables:
+.INDENT 0.0
+.TP
+.B \fBSharedMimeInfo_FOUND\fP
+True if system has the shared\-mime\-info package
+.TP
+.B \fBUPDATE_MIME_DATABASE_EXECUTABLE\fP
+The update\-mime\-database executable
+.UNINDENT
+.sp
+and the following imported targets:
+.INDENT 0.0
+.TP
+.B \fBSharedMimeInfo::UpdateMimeDatabase\fP
+The update\-mime\-database executable
+.UNINDENT
+.sp
+The follow macro is available:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+update_xdg_mimetypes(<path>)
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Updates the XDG mime database at install time (unless the \fB$DESTDIR\fP
+environment variable is set, in which case it is up to package managers to
+perform this task).
+.sp
+Since pre\-1.0.0.
+.SS FindWayland
+.sp
+Try to find Wayland.
+.sp
+This is a component\-based find module, which makes use of the COMPONENTS
+and OPTIONAL_COMPONENTS arguments to find_module.  The following components
+are available:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+Client  Server  Cursor  Egl
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+If no components are specified, this module will act as though all components
+were passed to OPTIONAL_COMPONENTS.
+.sp
+This module will define the following variables, independently of the
+components searched for or found:
+.INDENT 0.0
+.TP
+.B \fBWayland_FOUND\fP
+TRUE if (the requested version of) Wayland is available
+.TP
+.B \fBWayland_VERSION\fP
+Found Wayland version
+.TP
+.B \fBWayland_TARGETS\fP
+A list of all targets imported by this module (note that there may be more
+than the components that were requested)
+.TP
+.B \fBWayland_LIBRARIES\fP
+This can be passed to target_link_libraries() instead of the imported
+targets
+.TP
+.B \fBWayland_INCLUDE_DIRS\fP
+This should be passed to target_include_directories() if the targets are
+not used for linking
+.TP
+.B \fBWayland_DEFINITIONS\fP
+This should be passed to target_compile_options() if the targets are not
+used for linking
+.UNINDENT
+.sp
+For each searched\-for components, \fBWayland_<component>_FOUND\fP will be set to
+TRUE if the corresponding Wayland library was found, and FALSE otherwise.  If
+\fBWayland_<component>_FOUND\fP is TRUE, the imported target
+\fBWayland::<component>\fP will be defined.  This module will also attempt to
+determine \fBWayland_*_VERSION\fP variables for each imported target, although
+\fBWayland_VERSION\fP should normally be sufficient.
+.sp
+In general we recommend using the imported targets, as they are easier to use
+and provide more control.  Bear in mind, however, that if any target is in the
+link interface of an exported library, it must be made available by the
+package config file.
+.sp
+Since pre\-1.0.0.
+.SS FindWaylandScanner
+.sp
+Try to find wayland\-scanner.
+.sp
+If the wayland\-scanner executable is not in your PATH, you can provide
+an alternative name or full path location with the \fBWaylandScanner_EXECUTABLE\fP
+variable.
+.sp
+This will define the following variables:
+.INDENT 0.0
+.TP
+.B \fBWaylandScanner_FOUND\fP
+True if wayland\-scanner is available.
+.TP
+.B \fBWaylandScanner_EXECUTABLE\fP
+The wayland\-scanner executable.
+.UNINDENT
+.sp
+If \fBWaylandScanner_FOUND\fP is TRUE, it will also define the following imported
+target:
+.INDENT 0.0
+.TP
+.B \fBWayland::Scanner\fP
+The wayland\-scanner executable.
+.UNINDENT
+.sp
+This module provides the following functions to generate C protocol
+implementations:
+.INDENT 0.0
+.INDENT 3.5
+.INDENT 0.0
+.IP \(bu 2
+\fBecm_add_wayland_client_protocol\fP
+.IP \(bu 2
+\fBecm_add_wayland_server_protocol\fP
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ecm_add_wayland_client_protocol(<source_files_var>
+                                PROTOCOL <xmlfile>
+                                BASENAME <basename>)
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Generate Wayland client protocol files from \fB<xmlfile>\fP XML
+definition for the \fB<basename>\fP interface and append those files
+to \fB<source_files_var>\fP\&.
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+ecm_add_wayland_server_protocol(<source_files_var>
+                                PROTOCOL <xmlfile>
+                                BASENAME <basename>)
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Generate Wayland server protocol files from \fB<xmlfile>\fP XML
+definition for the \fB<basename>\fP interface and append those files
+to \fB<source_files_var>\fP\&.
+.sp
+Since 1.4.0.
+.SS FindX11_XCB
+.sp
+Try to find the X11 XCB compatibility library.
+.sp
+This will define the following variables:
+.INDENT 0.0
+.TP
+.B \fBX11_XCB_FOUND\fP
+True if (the requested version of) libX11\-xcb is available
+.TP
+.B \fBX11_XCB_VERSION\fP
+The version of libX11\-xcb (this is not guaranteed to be set even when
+X11_XCB_FOUND is true)
+.TP
+.B \fBX11_XCB_LIBRARIES\fP
+This can be passed to target_link_libraries() instead of the \fBEGL::EGL\fP
+target
+.TP
+.B \fBX11_XCB_INCLUDE_DIR\fP
+This should be passed to target_include_directories() if the target is not
+used for linking
+.TP
+.B \fBX11_XCB_DEFINITIONS\fP
+This should be passed to target_compile_options() if the target is not
+used for linking
+.UNINDENT
+.sp
+If \fBX11_XCB_FOUND\fP is TRUE, it will also define the following imported
+target:
+.INDENT 0.0
+.TP
+.B \fBX11::XCB\fP
+The X11 XCB compatibility library
+.UNINDENT
+.sp
+In general we recommend using the imported target, as it is easier to use.
+Bear in mind, however, that if the target is in the link interface of an
+exported library, it must be made available by the package config file.
+.sp
+Since pre\-1.0.0.
+.SS FindXCB
+.sp
+Try to find XCB.
+.sp
+This is a component\-based find module, which makes use of the COMPONENTS and
+OPTIONAL_COMPONENTS arguments to find_module.  The following components are
+available:
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+XCB
+ATOM         AUX          COMPOSITE    CURSOR       DAMAGE
+DPMS         DRI2         DRI3         EVENT        EWMH
+GLX          ICCCM        IMAGE        KEYSYMS      PRESENT
+RANDR        RECORD       RENDER       RENDERUTIL   RES
+SCREENSAVER  SHAPE        SHM          SYNC         UTIL
+XEVIE        XF86DRI      XFIXES       XINERAMA     XINPUT
+XKB          XPRINT       XTEST        XV           XVMC
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+If no components are specified, this module will act as though all components
+except XINPUT (which is considered unstable) were passed to
+OPTIONAL_COMPONENTS.
+.sp
+This module will define the following variables, independently of the
+components searched for or found:
+.INDENT 0.0
+.TP
+.B \fBXCB_FOUND\fP
+True if (the requestion version of) xcb is available
+.TP
+.B \fBXCB_VERSION\fP
+Found xcb version
+.TP
+.B \fBXCB_TARGETS\fP
+A list of all targets imported by this module (note that there may be more
+than the components that were requested)
+.TP
+.B \fBXCB_LIBRARIES\fP
+This can be passed to target_link_libraries() instead of the imported
+targets
+.TP
+.B \fBXCB_INCLUDE_DIRS\fP
+This should be passed to target_include_directories() if the targets are
+not used for linking
+.TP
+.B \fBXCB_DEFINITIONS\fP
+This should be passed to target_compile_options() if the targets are not
+used for linking
+.UNINDENT
+.sp
+For each searched\-for components, \fBXCB_<component>_FOUND\fP will be set to
+true if the corresponding xcb library was found, and false otherwise.  If
+\fBXCB_<component>_FOUND\fP is true, the imported target \fBXCB::<component>\fP
+will be defined.  This module will also attempt to determine
+\fBXCB_*_VERSION\fP variables for each imported target, although
+\fBXCB_VERSION\fP should normally be sufficient.
+.sp
+In general we recommend using the imported targets, as they are easier to use
+and provide more control.  Bear in mind, however, that if any target is in the
+link interface of an exported library, it must be made available by the
+package config file.
+.sp
+Since pre\-1.0.0.
+.SH COPYRIGHT
+KDE Developers
+.\" Generated by docutils manpage writer.
+.
