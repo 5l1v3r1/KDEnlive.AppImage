@@ -51,4 +51,4 @@ export APPIMAGE_STARTUP_MLT_PRESETS_PATH=$MLT_PRESETS_PATH
 export APPIMAGE_STARTUP_SDL_AUDIODRIVER=$SDL_AUDIODRIVER
 export APPIMAGE_STARTUP_XDG_CURRENT_DESKTOP=$XDG_CURRENT_DESKTOP
 
-kdenlive --config kdenlive-appimagerc $@
+kdenlive --config kdenlive-appimagerc "$@"
