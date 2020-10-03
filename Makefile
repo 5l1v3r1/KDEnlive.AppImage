@@ -1,4 +1,4 @@
-SOURCE="https://download.kde.org/unstable/kdenlive/16.12/linux/Kdenlive-16.12-rc-x86_64.AppImage"
+SOURCE="https://files.kde.org/kdenlive/release/kdenlive-20.08.1-x86_64.appimage"
 OUTPUT="KDEnlive.AppImage"
 
 all:
